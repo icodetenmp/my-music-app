@@ -1,0 +1,38 @@
+const express = require('express');
+const app = express();
+const db = require('./db');
+const path = require('path');
+const tracksRouter = require('./routes/tracks');
+
+//SERVE JSON
+app.use(express.json());
+
+//SERVE FRONTEND
+app.use(express.static(path.join(__dirname, '../Frontend')));
+
+//SERVE BACKEND
+app.use(express.static(path.join(__dirname, '../backend')));
+
+//SERVE COVERS
+const coverPath = path.resolve(__dirname, 'uploads', 'covers');
+app.use('/uploads/covers', express.static(coverPath));
+
+
+//SERVE AUDIO FILES
+const audioPath = path.resolve(__dirname, 'uploads', 'audio');
+app.use('/uploads/audio', express.static(audioPath));
+
+//console.log('serving uploads form:', uploaddBase); 
+
+
+//ROUTES
+app.use('/api/tracks', tracksRouter);
+
+
+app.get('/',(req, res) =>{
+    res.send('API is runing');
+} );
+
+//start server
+const PORT = 5000;
+app.listen(PORT, ( )=> console.log(`server runing on port ${PORT}`));
