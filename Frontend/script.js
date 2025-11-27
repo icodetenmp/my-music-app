@@ -10,19 +10,39 @@ const staticArtist = document.querySelectorAll('.text2');
 const staticTitle = document.querySelectorAll('.title');
 const submitbtn = document.querySelector('.submit');
 const form = document.getElementById('uploadForm');
+const upDel = document.getElementById('upDelbtn');
+const ham = document.querySelector(".hamburger")
+const ul = document.querySelector(".ul");
+const footer = document.querySelector('.foot');
+console.log(upLoad);
 
 
 
 let trackEle = null;
 let currentTrackId = null;
 let tracks = [];
+let isOpen = false;
+ham.addEventListener("click", ()=>{
+    isOpen = !isOpen;
+
+    if(isOpen){
+        ul.style.visibility = "visible";
+    }else{
+        ul.style.visibility = "hidden";
+    }
+    
+
+    
+
+});
+
 
 
 upLoad.addEventListener("click", ()=>{
     upbtn.forEach(e =>{
         e.style.visibility = "visible";
         
-    }); 
+    });
     about.style.visibility="visible";
 });
 
@@ -35,6 +55,7 @@ upbtn.forEach(btn => {
 
 
         closebtn.addEventListener("click", ()=>{
+        modal.style.display = "none";
             
             inPut.forEach(input => {
                 input.value = '';
@@ -49,12 +70,12 @@ upbtn.forEach(btn => {
        form.addEventListener("submit", (e)=>{
         e.preventDefault();
 
-        trackEle.querySelector('.text2').textContent = modal.querySelector('.input').value;
+        trackEle.querySelector('.text2').textContent = modal.querySelector('.input[name="artist"]').value;
         trackEle.querySelector('.title').textContent = modal.querySelector('.input[name="title"]').value;
-        //trackEle.querySelector('.imge').src = modal.querySelector('.but[name="cover"]').value;
+        trackEle.querySelector('.imge').src = modal.querySelector('.but[name="cover"]').value;
 
         modal.style.display = "none";
-        const updatedArtist = modal.querySelector('.input').value;
+        const updatedArtist = modal.querySelector('.input[name="artist"]').value;
         const upDatedTitle = modal.querySelector('.input[name="title"]').value;
         const trackId = trackEle.dataset.id;
 
@@ -107,96 +128,141 @@ upbtn.forEach(btn => {
              <p> <span class="title">${track.title}</span></p>
                 <p class="text2">${track.artist}</p>
                  <div class="medialine">
+                        <hr>
+                    <hr class="line">
+                
                   <audio class="audio" src="${track.audioPath}" preload="metadata"></audio>
                     <div class="playbutton">
-                    <i class="fa-solid fa-play"></i>
-                    </div>
-                    
-                    <hr>
-                    <hr class="line">
-                   
+                    <i class="fa-solid fa-play"></i>                   
+                </div>
+
                 </div>
                 </div>
                 <div id="upDelbtn">
                 <button class="Up" data-id="${track.id}">Update</button>
                 </div>
-    
-       
         `;
         container.appendChild(trackEl);
 
+        //Set video Player source fromthe first track that has a videoPath
+       if(track.videoPath) {
+        const videoPlayer = document.getElementById("videoPlayer");
+        videoPlayer.src = track.videoPath;
+        videoPlayer.load();
+       }
+         //UPLOAD BUTTON
+            const upLoad = document.querySelector('.Upload');
+            let manageMode = false;
+            if (upLoad){
+                upLoad.addEventListener("click", (e) =>{
+                    e.stopPropagation();
+                    manageMode = !manageMode;
+
+                    document.querySelectorAll('.Up').forEach(but =>{
+                        but.style.visibility = manageMode ? "visible" : "hidden";
+                    });
+                    console.log(manageMode ? "Manage Mode ON" : "Manage Mode OFF");
+                });
+            }
         const playBtn = trackEl.querySelector('.playbutton');
         const audio = trackEl.querySelector('.audio');
         const progressFill = trackEl.querySelector('.line');
+        console.log(trackEl);
 
        document.addEventListener("click", (e)=>{
-        if (e.target.closest(".playbutton")){
-            const btn = e.target.closest(".playbutton");
-            const trackContainer = btn.closest(".container");
-            const audio = trackContainer.querySelector('.audio');
+        const btn = e.target.closest(".playbutton");
+        if (!btn) return;
 
-            console.log("Audio source:", audio.src);
+        const trackEl = btn.closest('.container');
+        if(!trackEl) return;
 
+         const audio = trackEl.querySelector('.audio');
             if (!audio || !audio.src){
                 alert("No audio souurce found!");
                 return;
             }
+
             //PAUSE ALL OTHER TRACKS
-            document.querySelectorAll("audio").forEach(a =>{
+            document.querySelectorAll(".audio").forEach(a =>{
                 if (a !== audio){
                     a.pause();
-                    a.closest(".container").querySelector(".playbutton").innerHTML = '<i class="fa-solid fa-play"></i>';
+                  const otherBtn = a.closest(".container")?.querySelector(".playbutton")
+                  if(otherBtn) otherBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
                 }
             });
-
+            
+            //Toggle
             if (audio.paused){
-                audio.play().then(() => {
+                audio.play();
                     btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                }).catch(err => console.error("Audio play error:", err));
-            } else{ 
+
+            } else{
                 audio.pause();
                 btn.innerHTML = '<i class="fa-solid fa-play"></i>';
-               
-                
-            } 
+            }
+            
 
-        }
+        const titleEl = trackEl.querySelector(".title");
+        const artistEl = trackEl.querySelector(".text2");
+        const coverImg = container.querySelector(".img") || trackEl.querySelector('.imge');
 
-       })
-            //PROGRESSI BAR
-         audio.addEventListener('timeupdate', () =>{
-            if (!audio.duration) return;
-            const progress = (audio.currenTime / audio.duration) * 100;
-            progressFill.style.width = `${progress}%`;
-        });
 
-        //RESET ON END
-        audio.addEventListener("ended", () =>{
-            playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-            progressFill.style.width = '0%';
-        });
-        
-            trackEl.querySelector('.Up').style.visibility = "hidden";
-            upLoad.addEventListener("click", ()=>{
-                trackEl.querySelector('.Up').style.visibility = "visible";
-            });
+        const NowTitleEl = document.getElementById("Nowtitle");
+        const nowArtistEl = document.getElementById('Nowartist');
+        const nowCoverEl = document.getElementById('Nowcover');
+
+        if (NowTitleEl && titleEl) NowTitleEl.textContent = titleEl.textContent.trim();
+        if (nowArtistEl && artistEl) nowArtistEl.textContent = artistEl.textContent.trim();
+        if(nowCoverEl && coverImg) nowCoverEl.src = coverImg.src;
+
+
+
+
+                //PROGRESSI BAR
+                audio.addEventListener("timeupdate", ()=>{
+                    if (!audio.duration) return;
+                    const progress = (audio.currentTime / audio.duration) * 85;
+
+                    const trackEl = btn.closest(".container");
+                    const line = trackEl.querySelector(".line");
+                    if (line){
+                        line.style.width = progress + "%";
+                    };
+                })
+
+                //Reset when song ends
+                audio.addEventListener("ended", ()=>{
+                    btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                    const line = btn.closest(".container").querySelector(".line");
+                    if(line) line.style.width = "0%";
+                });
+       });
+
+
 
            
+            
+           
 
-        //ATTACK SAME MODALS
+       //ATTACK SAME MODALS
         trackEl.querySelector('.Up').addEventListener("click", ()=>{
            editTrack(track.id, track.artist, track.title);
         });
         //console.log("Track info: track");
 
          });
-         } catch (err) {
-            console.error('error fetching tracks:', err);
-         }
+
+    
          
 
-  }
+  }catch (err) {
+            console.error('error fetching tracks:', err);
+            
+         }
 
+        };
+
+  
 
    document.addEventListener("click", (e) =>{
                 
@@ -249,12 +315,14 @@ upbtn.forEach(btn => {
         //FOR FORMDATA COVER FILES UPLOAD
         const coverFile = dynaForm.querySelector('[name="cover"]').files[0];
         const audioFile = dynaForm.querySelector('[name="audio"]').files[0];
+        const videoFile = dynaForm.querySelector('[name = "video"]').files[0];
 
         const formData = new FormData();
         formData.append('artist', artist);
         formData.append('title', title);
         if (coverFile) formData.append('cover', coverFile);
         if(audioFile) formData.append('audio', audioFile);
+        if (videoFile) formData.append('video', videoFile);
 
        
         try{
@@ -263,10 +331,27 @@ upbtn.forEach(btn => {
             body: formData
         });
 
-
+        if (!res.ok){
+            throw new Error("Network responsse was not okay");
+        }
         const data = await res.json();
-        console.log("Updated track:", data);
-        await fetchTrack();
+        console.log("Full backend response:", data);
+        console.log("Updated video player with:", data.videoPath);
+    
+
+        //trackEl.querySelector(".text2").textContent = updatedArtist;
+        //trackEl.querySelector(".title").textContent = upDatedTitle;
+        
+        // if video was uploaded update the top video player
+
+        if (data.videoPath){
+            const videoPlayer = document.getElementById("videoPlayer");
+             videoPlayer.src = `http://localhost:5000${data.videoPath}`;
+            videoPlayer.load();
+            console.log("Video updated succesfully!");
+        }else{
+            console.warn("no videoPath returned from backend");
+        }
 
          if(res.ok){
             const trackCard = document.querySelector(`[data-id="${id}"]`)
@@ -299,4 +384,4 @@ upbtn.forEach(btn => {
 
     };
   }
-  document.addEventListener("DOMContentLoaded", fetchTrack);
+  document.addEventListener("DOMContentLoaded", fetchTrack, editTrack);

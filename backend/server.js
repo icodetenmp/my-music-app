@@ -22,6 +22,11 @@ app.use('/uploads/covers', express.static(coverPath));
 const audioPath = path.resolve(__dirname, 'uploads', 'audio');
 app.use('/uploads/audio', express.static(audioPath));
 
+//serve video files
+const videoPath = path.resolve(__dirname, 'uploads', 'video');
+app.use('/uploads/video', express.static(videoPath));
+
+
 //console.log('serving uploads form:', uploaddBase); 
 
 
@@ -34,5 +39,9 @@ app.get('/',(req, res) =>{
 } );
 
 //start server
-const PORT = 5000;
-app.listen(PORT, ( )=> console.log(`server runing on port ${PORT}`));
+const port = process.env.PORT || 5000;
+app.listen(port, ( )=> {
+console.log(`server runing on port ${port}`);
+ 
+});
+ 

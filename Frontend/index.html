@@ -10,18 +10,16 @@
 </head>
 <body>
     <div id="body-main">
-        <header class="header">
+        <header class="header" >
             <h2>MY<span>Music</span></h2>
             
             <nav>
                 <div class="hamburger">
                 <i class="fa-solid fa-bars"></i>
                 </div>
-            <ul>
+            <ul class="ul">
                 <li><a href="#home">HOME</a></li>
-                <li><a href="#secondsec">SONG</a></li>
-                <li><a href="#videos">VIDEOS</a></li>
-                <li><a href="#About">ABOUT</a></li>
+                <li><a href="#secondsec">SONGs</a></li>
             </ul>
             </nav>
             <button class="Upload">Upload</button>
@@ -31,9 +29,8 @@
           <div class="videoCont">
             <h3><i>Discover & Stream</h3></i></h3>
             <p></p>
-            <video width="640"  poster="placeholder.jpg">
-                <source src="sample.mp4" type="video/mp4">
-                Your browser does not support the video tag.
+            <video width="100%"  id="videoPlayer" poster="placeholder.jpg" controls>
+                
             </video>
           </div>
           <div class="play">
@@ -43,7 +40,7 @@
         </section>
 
         <section id="secondsec">
-            <h2>MUSIC</h2>
+            <div id="muc"><h2>MUSIC</h2></div>
             <div class="flex">
             <div class="container"  data-id="1">
                 <div class="image">
@@ -179,27 +176,7 @@
             </div>
 
             </div>
-
-            
-
-        </section>
-
-        <section id="About">
-            <h2>ABOUT</h2>
-            <div class="frame">
-                <div class="image">
-                    <video id="About" width="300px" height="auto"  poster="./images/6.jpg" controls>
-
-                    </video>
-
-                    <div class="aboutbtn">Upload</div>
-                    
-
-                </div>
-
-            </div>
-
-            <div id="parentModal">
+ <div id="parentModal">
                 <div class="modal">
                     <h4>Upload New Track</h4>
                     <form id="uploadForm" enctype="multipart/form-data">
@@ -230,7 +207,7 @@
                         <span class="space"></span>
 
                         <label>Video File
-                        <input type="file" name="cover" class="but" accept="image/* required"/>
+                        <input type="file" name="video" class="but" accept="video/*"/>
                         </label>
 
                         <span class="space"></span>
@@ -242,13 +219,48 @@
                 </div>
 
             </div>
-
             
 
         </section>
-        
+
+      
         <hr class="outside">
+
+        
+
+
+
         <footer class="foot">
+                        <svg class="wave" viewBox="0 0 500 50" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="waveGradient" x1=""0% y1="0%" x2=""100% y2="0%">  
+                    <stop offset="0%" stop-color="#505050"/>
+                    <stop offset="100%" stop-color="#000000"/>
+                </linearGradient>
+            </defs>
+
+            <path d="M0,30 C150,60 350,0 500,30 L500,50 L0,50 Z"></path>
+            </svg>
+            
+            <h5><i>NOW PLAYING</i></h5>
+            <div id="card">
+                <hr class="cardLine" >
+                <div class="cardLine2" ></div>
+            <div class="circle1">
+                <img id="Nowcover" src="" alt="cover">
+            <div class="circle2"></div>
+        </div>
+        </div>
+
+        <div class="nowplaying">
+            <h5>NOW - PLAYING</h5>
+            <h6 id="Nowtitle">song-title</h6>
+            <p id="Nowartist">Artist</p>
+
+
+        </div>
+
+            <div class="styles"></div>
             <i class="fa-brands fa-facebook"></i>
             <i class="fa-brands fa-instagram"></i>
             <i class="fa-brands fa-square-x-twitter"></i>

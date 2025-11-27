@@ -7,14 +7,23 @@ const path = require('path');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         //Store in correct subfolder based on fieldname
-        const folder = file.fieldname === 'cover' ? 'covers' : 'audio';
-        cb(null, path.resolve(__dirname, `../uploads/${folder}`));
+        const folder =
+        file.fieldname === 'cover'
+        ? 'covers'
+        : file.fieldname === 'video'
+        ? 'video'
+        : 'audio';
+        cb(null, path.resolve(__dirname, '../uploads/', folder));
     },
     filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname) || 'jpg'; 
-        const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9) + ext;
+        const ext = path.extname(file.originalname); 
+        const base = path
+        .basename(file.originalname, ext)
+        .replace(/\s+/g, '_')
+        .replace(/[^a-zA-Z0-9_-]/g, '');
+        const uniqueName = `${Date.now()}-${base}${ext}`
         cb(null, uniqueName);
-    }
+    },
 });
 const upload = multer({storage});
 
@@ -27,10 +36,14 @@ router.get('/', (req,res) =>{
         ...track,
         coverPath: track.coverPath 
         ? `${BASE_URL}${track.coverPath}`
-        : `${BASE_URL}/uploads/covers/placeholder1.jpg`,
+        : null,
         audioPath: track.audioPath 
-        ? `${BASE_URL}${track.audioPath}` 
-        : ''
+        ? `${BASE_URL}${track.audioPath}`
+        : null,
+
+        videoPath: track.videoPath 
+        ? `${BASE_URL}${track.videoPath}` 
+        : null
     }));
     res.json(tracksWithCovers);
     }catch (err) {
@@ -40,7 +53,7 @@ router.get('/', (req,res) =>{
 })
 
 
-router.put('/:id', upload.fields([{name: 'cover', maxCount: 1}, {name: 'audio', maxCount: 1}]), (req, res) =>{
+router.put('/:id', upload.fields([{name: 'cover', maxCount: 1}, {name: 'audio', maxCount: 1},{name: 'video', maxCount: 1}]),(req, res) =>{
     
     //console.log("REQ.FILES:", req.files);
     try{
@@ -52,35 +65,43 @@ router.put('/:id', upload.fields([{name: 'cover', maxCount: 1}, {name: 'audio', 
         }
 
         //ACCESS UPLOADED FILES SAFELY
-        const coverFile = req.files?.cover ? req.files.cover[0] : null;
-        const audioFile = req.files?.audio ? req.files.audio[0] : null;
+        const coverFile = req.files?.cover?.[0];
+        const audioFile = req.files?.audio?.[0];
+        const videoFile = req.files?.video?.[0];
 
         //BUILD NEW PATHS (ONLY IF NEW FILES ARE UPLOADED)
         const coverPath = coverFile ? `/uploads/covers/${coverFile.filename}`: null;
         const audioPath = audioFile ? `/uploads/audio/${audioFile.filename}` : null;
+        const videoPath = videoFile? `/uploads/video/${videoFile.filename}` : null;
 
         console.log("Updating tracks:", {
             id,
             artist,
             title,
             coverPath,
-            audioPath
+            audioPath,
+            videoPath
         });
 
         const stmt = db.prepare(`
             UPDATE tracks
             SET artist = ?, title = ?, 
             coverPath = COALESCE(?, coverPath),
-             audioPath = COALESCE(?, audioPath)
+             audioPath = COALESCE(?, audioPath),
+             videoPath = COALESCE(?, videoPath)
             WHERE id = ?
             `);
 
-           const result =  stmt.run(artist, title, coverPath,audioPath, id);
+           const result =  stmt.run(artist, title, coverPath,audioPath, videoPath, id);
 
            if (result.changes === 0){
             return res.status(404).json({error: 'Track not found' });
            }
-            res.json({message: 'Track updated succesfuly!'});
+            res.json({message: 'Track updated succesfuly!',
+                coverPath,
+                audioPath,
+                videoPath
+            });
         }catch (err){
             console.error('PUT/api/tracks failed:', err);
             res.status(500).json({error: 'Internal server error'});
