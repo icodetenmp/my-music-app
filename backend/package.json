@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "sqlite3": "^5.1.6",
+    "better-sqlite3": "^11.3.0",
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "cors": "2.8.5"
