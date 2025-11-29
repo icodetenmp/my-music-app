@@ -20,10 +20,10 @@ app.use('/uploads/covers',
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-//refresh
+/*//refresh
 app.get('/:catchAll(.*)', (req, res)=>{
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
-})
+})*/
 
 //console.log('serving uploads form:', uploaddBase); 
 
