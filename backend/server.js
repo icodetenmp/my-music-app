@@ -7,7 +7,6 @@ const tracksRouter = require('./routes/tracks');
 //SERVE JSON
 app.use(express.json());
 
-const path = require ('path');
 
 app.use('uploads/audio',
     express.static(path.join(__dirname, "uploads",
