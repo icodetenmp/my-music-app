@@ -122,7 +122,8 @@ upbtn.forEach(btn => {
 
         trackEl.innerHTML = `
          <div class="image">
-                    <img class="imge"  src="${track.coverPath}"/>
+                    <img class="imge"  src="$/${track.coverPath ||
+                    'images/placeholder.jpg'}"/>
                 </div>
                 <div class="text">
              <p> <span class="title">${track.title}</span></p>
