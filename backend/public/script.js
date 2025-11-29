@@ -122,7 +122,7 @@ upbtn.forEach(btn => {
 
         trackEl.innerHTML = `
          <div class="image">
-                    <img class="imge"  src="$/${track.coverPath ||
+                    <img class="imge"  src="/${track.coverPath ||
                     'images/placeholder.jpg'}"/>
                 </div>
                 <div class="text">
@@ -132,7 +132,7 @@ upbtn.forEach(btn => {
                         <hr>
                     <hr class="line">
                 
-                  <audio class="audio" src="${track.audioPath}" preload="metadata"></audio>
+                  <audio class="audio" src="/${track.audioPath}" preload="metadata"></audio>
                     <div class="playbutton">
                     <i class="fa-solid fa-play"></i>                   
                 </div>
