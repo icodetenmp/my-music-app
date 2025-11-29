@@ -16,7 +16,7 @@ app.use('/uploads/covers',
     express.static(path.join(__dirname, 'uploads/covers')));
 
     app.use('/uploads/video',
-        express.atatic(path.join(__dirname, 'uploads/video')));
+        express.static(path.join(__dirname, 'uploads/video')));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
