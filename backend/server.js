@@ -22,7 +22,7 @@ app.use('/uploads/video', express.static(path.resolve(__dirname, 'uploads', 'vid
 app.use('/api/tracks', tracksRouter);
 
 
-app.get('/',(req, res) =>{
+app.get('*',(req, res) =>{
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 } );
 
