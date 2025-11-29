@@ -7,25 +7,24 @@ const tracksRouter = require('./routes/tracks');
 //SERVE JSON
 app.use(express.json());
 
-//SERVE FRONTEND
-app.use(express.static(path.join(__dirname, '../Frontend')));
+const path = require ('path');
 
-//SERVE BACKEND
-app.use(express.static(path.join(__dirname, '../backend')));
+app.use('uploads/audio',
+    express.static(path.join(__dirname, "uploads",
+        'audio')));
 
-//SERVE COVERS
-const coverPath = path.resolve(__dirname, 'uploads', 'covers');
-app.use('/uploads/covers', express.static(coverPath));
+app.use('/uploads/covers',
+    express.static(path.join(__dirname, 'uploads/covers')));
 
+    app.use('/uploads/video',
+        express.atatic(path.join(__dirname, 'uploads/video')));
 
-//SERVE AUDIO FILES
-const audioPath = path.resolve(__dirname, 'uploads', 'audio');
-app.use('/uploads/audio', express.static(audioPath));
+app.use(express.static(path.join(__dirname, 'public')));
 
-//serve video files
-const videoPath = path.resolve(__dirname, 'uploads', 'video');
-app.use('/uploads/video', express.static(videoPath));
-
+//refresh
+app.get('*', (req, res)=>{
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+})
 
 //console.log('serving uploads form:', uploaddBase); 
 
