@@ -21,7 +21,7 @@ app.use('/uploads/covers',
 app.use(express.static(path.join(__dirname, 'public')));
 
 //refresh
-app.get('*', (req, res)=>{
+app.get('/:catchAll(.*)', (req, res)=>{
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 })
 
