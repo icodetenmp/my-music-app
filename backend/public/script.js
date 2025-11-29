@@ -79,7 +79,7 @@ upbtn.forEach(btn => {
         const upDatedTitle = modal.querySelector('.input[name="title"]').value;
         const trackId = trackEle.dataset.id;
 
-        fetch(`http://localhost:5000/api/tracks/${trackId}`, {
+        fetch(`/api/tracks/${trackId}`, {
             method: 'PUT',
             headers: {'Content-Type': 'application/json',
                  'x-admin-token': 'YOUR_ADMIN_TOKEN'
@@ -105,7 +105,7 @@ upbtn.forEach(btn => {
   async function fetchTrack(){
 
     try{
-    const res = await fetch(`http://localhost:5000/api/tracks`);
+    const res = await fetch(`/api/tracks`);
     tracks =  await res.json();
    // console.log("Fetched tracks:", tracks);
     //console.log(tracks);
@@ -346,7 +346,7 @@ upbtn.forEach(btn => {
 
         if (data.videoPath){
             const videoPlayer = document.getElementById("videoPlayer");
-             videoPlayer.src = `http://localhost:5000${data.videoPath}`;
+             videoPlayer.src = data.videoPath;
             videoPlayer.load();
             console.log("Video updated succesfully!");
         }else{
@@ -360,16 +360,15 @@ upbtn.forEach(btn => {
                 trackCard.querySelector('.title').textContent = data.title;
 
                 if(data.coverPath){
-                    trackCard.querySelector('img').src = `http://localhost:5000${data.coverPath}?v=${Date.now()}`;
+                    trackCard.querySelector('img').src = data.coverPath;
 
                 }
             }
+        }
 
             dynaForm.reset();
             modal.style.display = "none";
             alert("Track updated succesfully!");
-
-        }
 
         console.log("updated track:", data);
         dynaForm.reset();
@@ -383,5 +382,6 @@ upbtn.forEach(btn => {
         }
 
     };
-  }
+};
+  
   document.addEventListener("DOMContentLoaded", fetchTrack, editTrack);
