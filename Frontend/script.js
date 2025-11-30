@@ -22,6 +22,8 @@ let trackEle = null;
 let currentTrackId = null;
 let tracks = [];
 let isOpen = false;
+const BACKEND_URL = "https://my-music-app-backend.onrender.com"
+
 ham.addEventListener("click", ()=>{
     isOpen = !isOpen;
 
@@ -79,7 +81,7 @@ upbtn.forEach(btn => {
         const upDatedTitle = modal.querySelector('.input[name="title"]').value;
         const trackId = trackEle.dataset.id;
 
-        fetch(`http://localhost:5000/api/tracks/${trackId}`, {
+        fetch(`${BACKEND_URL}${trackId}`, {
             method: 'PUT',
             headers: {'Content-Type': 'application/json',
                  'x-admin-token': 'YOUR_ADMIN_TOKEN'
@@ -105,7 +107,7 @@ upbtn.forEach(btn => {
   async function fetchTrack(){
 
     try{
-    const res = await fetch(`http://localhost:5000/api/tracks`);
+    const res = await fetch(`${BACKEND_URL}/api/tracks`);
     tracks =  await res.json();
    // console.log("Fetched tracks:", tracks);
     //console.log(tracks);
