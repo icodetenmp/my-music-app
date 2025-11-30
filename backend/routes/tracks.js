@@ -30,7 +30,7 @@ const upload = multer({storage});
 router.get('/', (req,res) =>{
     try{
     const rows = db.prepare('SELECT * FROM tracks').all();
-    const BASE_URL = "http://localhost:5000";
+    const BASE_URL = "";
 
     const tracksWithCovers = rows.map(track => ({
         ...track,

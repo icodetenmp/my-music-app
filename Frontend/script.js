@@ -22,7 +22,7 @@ let trackEle = null;
 let currentTrackId = null;
 let tracks = [];
 let isOpen = false;
-const BACKEND_URL = "https://my-music-app-backend.onrender.com"
+const BACKEND_URL = "/"
 
 ham.addEventListener("click", ()=>{
     isOpen = !isOpen;
@@ -45,7 +45,6 @@ upLoad.addEventListener("click", ()=>{
         e.style.visibility = "visible";
         
     });
-    about.style.visibility="visible";
 });
 
 upbtn.forEach(btn => {
@@ -107,7 +106,7 @@ upbtn.forEach(btn => {
   async function fetchTrack(){
 
     try{
-    const res = await fetch(`${BACKEND_URL}/api/tracks`);
+    const res = await fetch(`/api/tracks`);
     tracks =  await res.json();
    // console.log("Fetched tracks:", tracks);
     //console.log(tracks);
@@ -348,7 +347,7 @@ upbtn.forEach(btn => {
 
         if (data.videoPath){
             const videoPlayer = document.getElementById("videoPlayer");
-             videoPlayer.src = `http://localhost:5000${data.videoPath}`;
+             videoPlayer.src = `${BACKEND_URL}${data.videoPath}`;
             videoPlayer.load();
             console.log("Video updated succesfully!");
         }else{
@@ -362,7 +361,7 @@ upbtn.forEach(btn => {
                 trackCard.querySelector('.title').textContent = data.title;
 
                 if(data.coverPath){
-                    trackCard.querySelector('img').src = `http://localhost:5000${data.coverPath}?v=${Date.now()}`;
+                    trackCard.querySelector('img').src = `${BACKEND_URL}${data.coverPath}?v=${Date.now()}`;
 
                 }
             }

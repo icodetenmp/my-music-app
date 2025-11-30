@@ -8,7 +8,7 @@ const tracksRouter = require('./routes/tracks');
 app.use(express.json());
 
 //SERVE FRONT END
-app.use(express.static(path.join(__dirname, '../Frontend')));
+
 
 
 //Serve uploads file
@@ -22,9 +22,6 @@ app.use('/uploads/video', express.static(path.resolve(__dirname, 'uploads', 'vid
 app.use('/api/tracks', tracksRouter);
 
 
-app.get('/',(req, res) =>{
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-} );
 
 //start server
 const PORT = process.env.PORT || 5000;
