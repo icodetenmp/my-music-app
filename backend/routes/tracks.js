@@ -30,7 +30,7 @@ const upload = multer({storage});
 router.get('/', (req,res) =>{
     try{
     const rows = db.prepare('SELECT * FROM tracks').all();
-    const BASE_URL = "";
+    const BASE_URL = "https://my-music-app-backend.onrender.com";
 
     const tracksWithCovers = rows.map(track => ({
         ...track,
