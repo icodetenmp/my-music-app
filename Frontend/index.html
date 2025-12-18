@@ -2,27 +2,31 @@
 <html lang="en">
 <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
     <div id="body-main">
         <header class="header" >
             <h2>MY<span>Music</span></h2>
-            
-            <nav>
-                <div class="hamburger">
-                <i class="fa-solid fa-bars"></i>
-                </div>
+        
+            <nav id="nav"> 
             <ul class="ul">
+                  
                 <li><a href="#home">HOME</a></li>
                 <li><a href="#secondsec">SONGs</a></li>
             </ul>
             </nav>
             <button class="Upload">Upload</button>
+            
+              <div class="hamburger">
+                <div class="ham">
+                <i class="fa-solid fa-bars ham"></i>
+                </div>
+                </div>
         </header>
 
         <section class="Discover" id="home">
@@ -239,11 +243,18 @@
                 </linearGradient>
             </defs>
 
-            <path d="M0,30 C150,60 350,0 500,30 L500,50 L0,50 Z"></path>
+            <path d="M0,30 C150,60 350,0 500,30 L500,50 L0,50 Z" fill="url(#waveGradient)"/>
             </svg>
             
-            <h5><i>NOW PLAYING</i></h5>
-            <div id="card">
+           
+            <div id="card"> 
+                 <h5><i>NOW PLAYING</i></h5>
+                  <div class="nowplaying">
+            <h5>NOW - PLAYING</h5>
+            <h6 id="Nowtitle">song-title</h6>
+            <p id="Nowartist">Artist</p>
+        </div>
+        <div class="manual"></div>
                 <hr class="cardLine" >
                 <div class="cardLine2" ></div>
             <div class="circle1">
@@ -252,19 +263,13 @@
         </div>
         </div>
 
-        <div class="nowplaying">
-            <h5>NOW - PLAYING</h5>
-            <h6 id="Nowtitle">song-title</h6>
-            <p id="Nowartist">Artist</p>
-
-
-        </div>
+       
 
             <div class="styles"></div>
             <i class="fa-brands fa-facebook"></i>
             <i class="fa-brands fa-instagram"></i>
             <i class="fa-brands fa-square-x-twitter"></i>
-            <p>@Icodetenmp</p>
+            <p class="p">@Icodetenmp</p>
         </footer>
 
     </div>

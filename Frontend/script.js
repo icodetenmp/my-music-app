@@ -4,24 +4,19 @@ const delBtn = document.querySelectorAll('.Del');
 const about = document.querySelector('.aboutbtn');
 const modal = document.getElementById("parentModal");
 const closebtn = document.querySelector('.close');
-const ArtistInput = modal.querySelector('.input[name="artist"]');
-const TitleInput = modal.querySelector('.input[name="title"]');
-const staticArtist = document.querySelectorAll('.text2');
-const staticTitle = document.querySelectorAll('.title');
-const submitbtn = document.querySelector('.submit');
 const form = document.getElementById('uploadForm');
-const upDel = document.getElementById('upDelbtn');
 const ham = document.querySelector(".hamburger")
 const ul = document.querySelector(".ul");
 const footer = document.querySelector('.foot');
+const container = document.querySelector(".flex");
 console.log(upLoad);
 
 
 
-let trackEle = null;
+
 let currentTrackId = null;
-let tracks = [];
 let isOpen = false;
+let manageMode = false;
 const BACKEND_URL = "https://my-music-app-backend.onrender.com"
 
 ham.addEventListener("click", ()=>{
@@ -32,75 +27,101 @@ ham.addEventListener("click", ()=>{
     }else{
         ul.style.visibility = "hidden";
     }
-    
+});
 
-    
+  //UPLOAD BUTTON
+                upLoad.addEventListener("click", (e) =>{
+                    e.stopPropagation();
+                    manageMode = !manageMode;
 
+                    document.querySelectorAll('.Up').forEach(but =>{
+                        but.style.visibility = manageMode ? "visible" : "hidden";
+                    });
+                    console.log(manageMode ? "Manage Mode ON" : "Manage Mode OFF");
+                });
+
+container.addEventListener("click", (e) => {
+    const btn = e.target.closest(".Up");
+    if (!btn) return;
+
+    const trackEl = btn.closest(".container");
+    const trackId = trackEl.dataset.id;
+    const artist = trackEl.querySelector(".text2").textContent;
+    const title = trackEl.querySelector(".title").textContent;
+
+    editTrack(trackId, artist, title);
 });
 
 
-
-upLoad.addEventListener("click", ()=>{
-    upbtn.forEach(e =>{
-        e.style.visibility = "visible";
-        
-    });
-});
-
-upbtn.forEach(btn => {
-    btn.addEventListener("click", (e)=>{
-         trackEle = e.target.closest(".container");
-        const trackId = trackEle.dataset.id;
-        
-        modal.classList.add("show");
-
-
-        closebtn.addEventListener("click", ()=>{
-        modal.style.display = "none";
+   closebtn.addEventListener("click", ()=>{
+        modal.style.opacity = "0";
+        modal.style.transform = "translateY(-20px)";
+        setTimeout(() => {
+            modal.style.display = "none";
             
-            inPut.forEach(input => {
-                input.value = '';
-            });
-            
+        })
         });
 
+       form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!currentTrackId) return;
+
+    const artist = form.querySelector('[name="artist"]').value;
+    const title = form.querySelector('[name="title"]').value;
+
+    if (!artist || !title) {
+        alert("Please fill in both fields");
+        return;
+    }
+
+    const coverFile = form.querySelector('[name="cover"]').files[0];
+    const audioFile = form.querySelector('[name="audio"]').files[0];
+    const videoFile = form.querySelector('[name="video"]').files[0];
+
+    const formData = new FormData();
+    formData.append("artist", artist);
+    formData.append("title", title);
+    if (coverFile) formData.append("cover", coverFile);
+    if (audioFile) formData.append("audio", audioFile);
+    if (videoFile) formData.append("video", videoFile);
+
+    try {
+        const res = await fetch(`${BACKEND_URL}/api/tracks/${currentTrackId}`, {
+            method: "PUT",
+            body: formData,
+        });
+
+        if (!res.ok) throw new Error("Update failed");
+
+        const data = await res.json();
+
+        // Update the track card in the UI
+        const trackCard = document.querySelector(`[data-id="${currentTrackId}"]`);
+        if (trackCard) {
+            trackCard.querySelector(".text2").textContent = data.artist;
+            trackCard.querySelector(".title").textContent = data.title;
+            if (data.coverPath) {
+                trackCard.querySelector("img").src = `${BACKEND_URL}${data.coverPath}?v=${Date.now()}`;
+            }
+        }
+
+        // Update video player if needed
+        if (data.videoPath) {
+            const videoPlayer = document.getElementById("videoPlayer");
+            videoPlayer.src = `${BACKEND_URL}${data.videoPath}`;
+            videoPlayer.load();
+        }
+
+        form.reset();
+        modal.style.display = "none";
+        fetchTrack(); // refresh track list
+        alert("Track updated successfully!");
+    } catch (err) {
+        console.error(err);
+        alert("Failed to update track.");
+    }
 });
- });
-
-
-       form.addEventListener("submit", (e)=>{
-        e.preventDefault();
-
-        trackEle.querySelector('.text2').textContent = modal.querySelector('.input[name="artist"]').value;
-        trackEle.querySelector('.title').textContent = modal.querySelector('.input[name="title"]').value;
-        trackEle.querySelector('.imge').src = modal.querySelector('.but[name="cover"]').value;
-
-        modal.style.display = "none";
-        const updatedArtist = modal.querySelector('.input[name="artist"]').value;
-        const upDatedTitle = modal.querySelector('.input[name="title"]').value;
-        const trackId = trackEle.dataset.id;
-
-        fetch(`${BACKEND_URL}${trackId}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json',
-                 'x-admin-token': 'YOUR_ADMIN_TOKEN'
-                },
-            body: JSON.stringify({
-                title: upDatedTitle,
-                artist: updatedArtist
-            })
-
-        })
-        .then(res => res.json())
-        .then(data => {console.log('Track updated on backend', data)
-
-            trackEle.querySelector('.text2').textContent=updatedArtist;
-            trackEle.querySelector('.title').textContent = upDatedTitle;
-
-        modal.style.display = "none";
-       })
-        .catch(err => console.error('update failed'));
- });
+ ;
 
  //BACKEND LOADING 
   async function fetchTrack(){
@@ -123,7 +144,7 @@ upbtn.forEach(btn => {
 
         trackEl.innerHTML = `
          <div class="image">
-                    <img class="imge"  src="${track.coverPath}"/>
+                    <img class="imge"  src="${BACKEND_URL}${track.coverPath}"/>
                 </div>
                 <div class="text">
              <p> <span class="title">${track.title}</span></p>
@@ -132,7 +153,7 @@ upbtn.forEach(btn => {
                         <hr>
                     <hr class="line">
                 
-                  <audio class="audio" src="${track.audioPath}" preload="metadata"></audio>
+                  <audio class="audio" src="${BACKEND_URL}${track.audioPath}" preload="metadata"></audio>
                     <div class="playbutton">
                     <i class="fa-solid fa-play"></i>                   
                 </div>
@@ -148,23 +169,10 @@ upbtn.forEach(btn => {
         //Set video Player source fromthe first track that has a videoPath
        if(track.videoPath) {
         const videoPlayer = document.getElementById("videoPlayer");
-        videoPlayer.src = track.videoPath;
+        videoPlayer.src = BACKEND_URL + track.videoPath;
         videoPlayer.load();
        }
-         //UPLOAD BUTTON
-            const upLoad = document.querySelector('.Upload');
-            let manageMode = false;
-            if (upLoad){
-                upLoad.addEventListener("click", (e) =>{
-                    e.stopPropagation();
-                    manageMode = !manageMode;
-
-                    document.querySelectorAll('.Up').forEach(but =>{
-                        but.style.visibility = manageMode ? "visible" : "hidden";
-                    });
-                    console.log(manageMode ? "Manage Mode ON" : "Manage Mode OFF");
-                });
-            }
+       
         const playBtn = trackEl.querySelector('.playbutton');
         const audio = trackEl.querySelector('.audio');
         const progressFill = trackEl.querySelector('.line');
@@ -241,16 +249,7 @@ upbtn.forEach(btn => {
 
 
 
-           
-            
-           
-
-       //ATTACK SAME MODALS
-        trackEl.querySelector('.Up').addEventListener("click", ()=>{
-           editTrack(track.id, track.artist, track.title);
-        });
-        //console.log("Track info: track");
-
+    
          });
 
     
@@ -263,126 +262,30 @@ upbtn.forEach(btn => {
 
         };
 
-  
-
-   document.addEventListener("click", (e) =>{
-                
-                if (e.target.closest('.Up')){
-                    const trackId = e.target.dataset.id;
-                    console.log("Update clicked for track:", trackId);
-
-
-                    modal.classList.add('show');
-                    modal.dataset.trackId = trackId;
-
-                    //console.log("modal element is:", modal);
-                    //console.log("modal classes now:", modal);
-                    
-
-                    
-                }
-            });
-            
-
 
 
   async function editTrack(id, artist, title) {
-    const dynaModal = modal;
-    const dynaForm = form;
+//Save track id globally
+    currentTrackId = id;
 
-    modal.style.display ="block";
-
-    dynaForm.querySelector('[name="artist"]').value = artist;
-    dynaForm.querySelector('[name="title"]').value = title;
+     modal.style.display ="block";
+     modal.style.opacity = "1";
+     modal.style.pointerEvents = "auto";
+     modal.style.transform = "translateY(0)";
 
     
 
-    closebtn.addEventListener("click", ()=>{
-        modal.style.display = "none";
-    })
-
-    dynaForm.onsubmit = async (e) =>{
-        e.preventDefault();
-        const title =  dynaForm.querySelector('[name="artist"]').value;
-        const artist =  dynaForm.querySelector('[name="title"]').value;
-
-        
-
-        if(!title || !artist){
-            alert('Please fill in both fields');
-            return;
-        }
-
-        //FOR FORMDATA COVER FILES UPLOAD
-        const coverFile = dynaForm.querySelector('[name="cover"]').files[0];
-        const audioFile = dynaForm.querySelector('[name="audio"]').files[0];
-        const videoFile = dynaForm.querySelector('[name = "video"]').files[0];
-
-        const formData = new FormData();
-        formData.append('artist', artist);
-        formData.append('title', title);
-        if (coverFile) formData.append('cover', coverFile);
-        if(audioFile) formData.append('audio', audioFile);
-        if (videoFile) formData.append('video', videoFile);
-
-       
-        try{
-        const res = await fetch(`${BACKEND_URL}/api/tracks/${id}`, {
-            method: "PUT",
-            body: formData
-        });
-
-        if (!res.ok){
-            throw new Error("Network responsse was not okay");
-        }
-        const data = await res.json();
-        console.log("Full backend response:", data);
-        console.log("Updated video player with:", data.videoPath);
     
 
-        //trackEl.querySelector(".text2").textContent = updatedArtist;
-        //trackEl.querySelector(".title").textContent = upDatedTitle;
-        
-        // if video was uploaded update the top video player
+    form.querySelector('[name="artist"]').value = artist;
+    form.querySelector('[name="title"]').value = title;
 
-        if (data.videoPath){
-            const videoPlayer = document.getElementById("videoPlayer");
-             videoPlayer.src = `${BACKEND_URL}${data.videoPath}`;
-            videoPlayer.load();
-            console.log("Video updated succesfully!");
-        }else{
-            console.warn("no videoPath returned from backend");
-        }
+    //reset file input
+    form.querySelector('[name="cover"]').value = "";
+    form.querySelector('[name="audio"]').value = "";
+    form.querySelector('[name="video"]').value = "";
 
-         if(res.ok){
-            const trackCard = document.querySelector(`[data-id="${id}"]`)
-            if(trackCard){
-                trackCard.querySelector('.text2').textContent = data.artist;
-                trackCard.querySelector('.title').textContent = data.title;
-
-                if(data.coverPath){
-                    trackCard.querySelector('img').src = `${BACKEND_URL}${data.coverPath}?v=${Date.now()}`;
-
-                }
-            }
-
-            dynaForm.reset();
-            modal.style.display = "none";
-            alert("Track updated succesfully!");
-
-        }
-
-        console.log("updated track:", data);
-        dynaForm.reset();
-        modal.style.display = "none";
-
-        fetchTrack();
-        
-
-        }catch (err){
-            console.error("Update failed:", err);
-        }
-
-    };
   }
-  document.addEventListener("DOMContentLoaded", fetchTrack, editTrack);
+
+
+    document.addEventListener("DOMContentLoaded", fetchTrack, editTrack);
