@@ -3,7 +3,11 @@ const app = express();
 const db = require('./db');
 const path = require('path');
 const tracksRouter = require('./routes/tracks');
+const cors = require('cors');
 
+app.use(cors({
+    origin: '*',
+}));
 //SERVE JSON
 app.use(express.json());
 
