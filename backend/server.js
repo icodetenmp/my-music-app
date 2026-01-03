@@ -8,12 +8,9 @@ const cors = require('cors');
 app.use(cors({
     origin: '*',
 }));
+
 //SERVE JSON
 app.use(express.json());
-
-//SERVE FRONT END
-
-
 
 //Serve uploads file
 app.use('/uploads/covers', express.static(path.resolve(__dirname, 'uploads', 'covers')));

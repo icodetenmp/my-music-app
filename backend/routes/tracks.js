@@ -1,110 +1,90 @@
+// routes/tracks.js
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const multer = require('multer');
-const path = require('path');
+const parser = require('../parser'); // Cloudinary parser
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        //Store in correct subfolder based on fieldname
-        const folder =
-        file.fieldname === 'cover'
-        ? 'covers'
-        : file.fieldname === 'video'
-        ? 'video'
-        : 'audio';
-        cb(null, path.resolve(__dirname, '../uploads/', folder));
-    },
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname); 
-        const base = path
-        .basename(file.originalname, ext)
-        .replace(/\s+/g, '_')
-        .replace(/[^a-zA-Z0-9_-]/g, '');
-        const uniqueName = `${Date.now()}-${base}${ext}`
-        cb(null, uniqueName);
-    },
-});
-const upload = multer({storage});
-
-router.get('/', (req,res) =>{
-    try{
-    const rows = db.prepare('SELECT * FROM tracks').all();
-    const BASE_URL = "https://my-music-app-backend.onrender.com";
-
-    const tracksWithCovers = rows.map(track => ({
-        ...track,
-        coverPath: track.coverPath 
-        ? `${BASE_URL}${track.coverPath}`
-        : null,
-        audioPath: track.audioPath 
-        ? `${BASE_URL}${track.audioPath}`
-        : null,
-
-        videoPath: track.videoPath 
-        ? `${BASE_URL}${track.videoPath}` 
-        : null
-    }));
-    res.json(tracksWithCovers);
-    }catch (err) {
-        console.error("GET /api/tracks failed:", err.messsage);
-        res.status(500).json({error: "failed to fetch tracks"});
+// GET all tracks
+router.get('/', (req, res) => {
+    try {
+        const rows = db.prepare('SELECT * FROM tracks').all();
+        // Cloudinary URLs are already full URLs in DB, so send them as-is
+        res.json(rows);
+    } catch (err) {
+        console.error("GET /api/tracks failed:", err.message);
+        res.status(500).json({ error: "Failed to fetch tracks" });
     }
-})
+});
 
-
-router.put('/:id', upload.fields([{name: 'cover', maxCount: 1}, {name: 'audio', maxCount: 1},{name: 'video', maxCount: 1}]),(req, res) =>{
-    
-    //console.log("REQ.FILES:", req.files);
-    try{
-        const {title, artist} = req.body;
+// PUT /api/tracks/:id → update track info + uploaded files
+router.put('/:id', parser.fields([
+    { name: 'cover', maxCount: 1 },
+    { name: 'audio', maxCount: 1 },
+    { name: 'video', maxCount: 1 }
+]), (req, res) => {
+    try {
+        const { title, artist } = req.body;
         const id = req.params.id;
-        
-        if(!artist || !title){
-            return res.status(400).json({error: 'Missing artist or title'});
+
+        if (!artist || !title) {
+            return res.status(400).json({ error: 'Missing artist or title' });
         }
 
-        //ACCESS UPLOADED FILES SAFELY
+        // Get uploaded files from Cloudinary parser
         const coverFile = req.files?.cover?.[0];
         const audioFile = req.files?.audio?.[0];
         const videoFile = req.files?.video?.[0];
 
-        //BUILD NEW PATHS (ONLY IF NEW FILES ARE UPLOADED)
-        const coverPath = coverFile ? `/uploads/covers/${coverFile.filename}`: null;
-        const audioPath = audioFile ? `/uploads/audio/${audioFile.filename}` : null;
-        const videoPath = videoFile? `/uploads/video/${videoFile.filename}` : null;
+        console.log("Updating track:", { id, artist, title, coverFile, audioFile, videoFile });
 
-        console.log("Updating tracks:", {
-            id,
-            artist,
-            title,
-            coverPath,
-            audioPath,
-            videoPath
-        });
+        // Dynamically build fields to update
+        const fieldsToUpdate = [];
+        const values = [];
+
+        fieldsToUpdate.push("artist = ?");
+        values.push(artist);
+
+        fieldsToUpdate.push("title = ?");
+        values.push(title);
+
+        if (coverFile) {
+            fieldsToUpdate.push("coverPath = ?");
+            values.push(coverFile.path); // Cloudinary URL
+        }
+
+        if (audioFile) {
+            fieldsToUpdate.push("audioPath = ?");
+            values.push(audioFile.path); // Cloudinary URL
+        }
+
+        if (videoFile) {
+            fieldsToUpdate.push("videoPath = ?");
+            values.push(videoFile.path); // Cloudinary URL
+        }
+
+        // Add ID for WHERE clause
+        values.push(id);
 
         const stmt = db.prepare(`
             UPDATE tracks
-            SET artist = ?, title = ?, 
-            coverPath = COALESCE(?, coverPath),
-             audioPath = COALESCE(?, audioPath),
-             videoPath = COALESCE(?, videoPath)
+            SET ${fieldsToUpdate.join(", ")}
             WHERE id = ?
-            `);
+        `);
 
-           const result =  stmt.run(artist, title, coverPath,audioPath, videoPath, id);
+        const result = stmt.run(...values);
 
-           if (result.changes === 0){
-            return res.status(404).json({error: 'Track not found' });
-           }
-            res.json({message: 'Track updated succesfuly!',
-                coverPath,
-                audioPath,
-                videoPath
-            });
-        }catch (err){
-            console.error('PUT/api/tracks failed:', err);
-            res.status(500).json({error: 'Internal server error'});
+        if (result.changes === 0) {
+            return res.status(404).json({ error: 'Track not found' });
         }
+
+        // Return updated track info
+        const track = db.prepare("SELECT * FROM tracks WHERE id = ?").get(id);
+        res.json(track);
+
+    } catch (err) {
+        console.error('PUT /api/tracks failed:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
-module.exports = router; 
+
+module.exports = router;
