@@ -1,4 +1,4 @@
-// resetTracks.js
+/*// resetTracks.js
 const db = require('./db'); // your existing db.js
 
 // Replace these with your actual Cloudinary URLs
@@ -21,3 +21,4 @@ tracks.forEach(track => {
 });
 
 console.log("All tracks reset to Cloudinary URLs!");
+*/
