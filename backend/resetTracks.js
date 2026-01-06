@@ -1,23 +1,47 @@
 // resetTracks.js
+const { video } = require('./cloudinary');
 const db = require('./db'); // your existing db.js
 
 // Replace these with your actual Cloudinary URLs
-const tracks = [
-  { id: 1, cover: "https://res.cloudinary.com/Root/image/upload/v12345-placeholder1.jpg", audio: "https://res.cloudinary.com/Root/video/upload/v12345-track1.mp3" },
-  { id: 2, cover: "https://res.cloudinary.com/Root/image/upload/v12345-placeholder2.jpg", audio: "https://res.cloudinary.com/Root/video/upload/v12345-track2.mp3" },
-  { id: 3, cover: "https://res.cloudinary.com/Root/image/upload/v12345-placeholder3.jpg", audio: "https://res.cloudinary.com/Root/video/upload/v12345-track3.mp3" },
-  { id: 4, cover: "https://res.cloudinary.com/Root/image/upload/v12345-placeholder4.jpg", audio: "https://res.cloudinary.com/Root/video/upload/v12345-track4.mp3" },
-  { id: 5, cover: "https://res.cloudinary.com/Root/image/upload/v12345-placeholder5.jpg", audio: "https://res.cloudinary.com/Root/video/upload/v12345-track5.mp3" },
-  { id: 6, cover: "https://res.cloudinary.com/Root/image/upload/v12345-placeholder6.jpg", audio: "https://res.cloudinary.com/Root/video/upload/v12345-track6.mp3" }
-];
+const cloudinaryData = {
+  covers: [
+    "https://res.cloudinary.com/dvp2cwhbz/image/upload/v1767686570/covers/placeholder1.jpg",
+    "https://res.cloudinary.com/dvp2cwhbz/image/upload/v1767686571/covers/placeholder2.jpg",
+    "https://res.cloudinary.com/dvp2cwhbz/image/upload/v1767686573/covers/placeholder3.jpg",
+    "https://res.cloudinary.com/dvp2cwhbz/image/upload/v1767686575/covers/placeholder4.jpg",
+    "https://res.cloudinary.com/dvp2cwhbz/image/upload/v1767686577/covers/placeholder5.jpg",
+    "https://res.cloudinary.com/dvp2cwhbz/image/upload/v1767686579/covers/placeholder6.jpg",
+    "https://res.cloudinary.com/dvp2cwhbz/image/upload/v1767686581/covers/placeholder7.jpg"
 
-tracks.forEach(track => {
-  const stmt = db.prepare(`
-    UPDATE tracks
-    SET coverPath = ?, audioPath = ?
-    WHERE id = ?
+  ],
+  audio: [
+    "https://res.cloudinary.com/dvp2cwhbz/video/upload/v1767686657/audio/1762453847550-Sarz-Ft-Dj-Tunez-Flash-Get-Up-TrendyBeatzcom.mp3",
+    "https://res.cloudinary.com/dvp2cwhbz/video/upload/v1767686661/audio/1762555335156-Sarz-Ft-Dj-Tunez-Flash-Get-Up-TrendyBeatzcom.mp3",
+    "https://res.cloudinary.com/dvp2cwhbz/video/upload/v1767686680/audio/1762555561716-damages_mastering_instr.wav",
+    "https://res.cloudinary.com/dvp2cwhbz/video/upload/v1767688462/audio/1763516408873-damages_mastering_instr.wav",
+    "https://res.cloudinary.com/dvp2cwhbz/video/upload/v1767688470/audio/1764437159311-Sarz-Ft-Dj-Tunez-Flash-Get-Up-TrendyBeatzcom.mp3"
+  ],
+
+  video : [
+     "https://res.cloudinary.com/dvp2cwhbz/video/upload/v1767688475/video/1763412652253-UPLOAD_YOUR.mp4"
+  ]
+  
+};
+
+db.exec("DELETE FROM tracks");
+
+const insert = db.prepare(`
+  INSERT INTO tracks (artist, title, audioPath, coverPath, videoPath)
+  VALUES (?, ?, ?, ?, ?)
   `);
-  stmt.run(track.cover, track.audio, track.id);
-});
 
-console.log("All tracks reset to Cloudinary URLs!");
+  for (let i = 0; 1< cloudinaryData.covers.length; i++){
+    insert.run(
+      'Unknown',
+      'Track ${i + 1}',
+      cloudinaryData.audio[0],
+      cloudinaryData.covers[i],
+      cloudinaryData.video[0]
+    );
+  }
+  console.log("Tracks reset and synced with cloudinary uRLs");

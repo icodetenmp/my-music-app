@@ -1,13 +1,14 @@
 // parser.js
 const multer = require('multer');
-const  CloudinaryStorage  = require('multer-storage-cloudinary');
-const cloudinary = require('./cloudinary'); // import the configured Cloudinary instance
+const CloudinaryStorage = require('multer-storage-cloudinary'); // No curly braces
+const cloudinary = require('./cloudinary'); // configured Cloudinary instance
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
     let folder = 'audio';
     let resource_type = 'video'; // default for audio/video
+
     if (file.fieldname === 'cover') {
       folder = 'covers';
       resource_type = 'image';
