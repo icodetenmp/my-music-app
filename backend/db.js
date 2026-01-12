@@ -27,18 +27,13 @@ db.exec(`
             insert.run(
                 'Unknown',
                 'Empty Slot',
-                '/uploads/audio/default.mp3',
-                '/uploads/covers/default.jpg',
-                '/uploads/videos/default.mp4'
+                'https://res.cloudinary.com/dvp2cwhbz/video/upload/v1767686657/audio/default.mp3',
+                'https://res.cloudinary.com/dvp2cwhbz/image/upload/v1767686570/covers/placeholder${i}.jpg',
+                'https://res.cloudinary.com/dvp2cwhbz/video/upload/v1767688475/video/1763412652253-UPLOAD_YOUR.mp4'
 
             );
         }
-        console.log("inserted 6 placeholder tracks");
-    }
-    const update = db.prepare(`UPDATE tracks SET coverPath = ? WHERE id = ?`);
-    for(let i = 1; i <= 6; i++){
-        update.run(`/uploads/covers/placeholder${i}.jpg`, i);
-        
+        console.log("inserted 6 cloudinary placeholder tracks");
     }
     console.log('updating existing tracks with unique covers');
     module.exports = db;
