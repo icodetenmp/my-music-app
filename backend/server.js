@@ -1,8 +1,11 @@
 // server.js
+require("dotenv").config();
+
 const express = require('express');
 const app = express();
 const tracksRouter = require('./routes/tracks');
 const cors = require('cors');
+
 
 app.use(cors({ origin: '*' }));
 

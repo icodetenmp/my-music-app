@@ -1,6 +1,6 @@
  const Database = require('better-sqlite3');
 const path = require('path');
-const dbPath = path.resolve(__dirname, '..', 'data.sqlite');
+const dbPath = path.resolve(__dirname,  'data.sqlite');
 const db = new Database(dbPath);
 db.exec(`
     CREATE TABLE IF NOT EXISTS tracks(
