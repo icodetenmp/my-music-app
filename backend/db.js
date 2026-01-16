@@ -13,7 +13,7 @@ db.exec(`
     createdAt TEXT DEFAULT CURRENT_TIMESTAMP
     );
     `);
-    const columns = db.prepare("PRAGMA table_info(tracks)").all();
+   /* const columns = db.prepare("PRAGMA table_info(tracks)").all();
     const hasVideoColumn = columns.some(c => c.name === 'videoPath');
     if(!hasVideoColumn){
         db.exec("ALTER TABLE tracks ADD COLUMN videoPath TEXT;");
@@ -35,7 +35,7 @@ db.exec(`
         }
         console.log("inserted 6 cloudinary placeholder tracks");
     }
-    console.log('updating existing tracks with unique covers');
+    console.log('updating existing tracks with unique covers');*/
     module.exports = db;
 
     
