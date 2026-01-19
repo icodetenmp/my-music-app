@@ -2,3 +2,5 @@ uploads
 uploads/
 node_modules
 .env
+data.sqlite
+*.sqlite

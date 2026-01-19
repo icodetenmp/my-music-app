@@ -1,8 +1,13 @@
 const db = require("./db");
 
-const insert = db.prepare(`INSERT INTO tracks (artist, title, audioPath, coverPath, videoPath)
-    VALUES (?, ?, ?, ?, ?)
-    `);
+const row = db.prepare("SELECT COUNT(*) as count FROM tracks").get();
+
+if(row.count === 0){
+    const insert = db.prepare(`
+        INSERT INTO tracks (artist, title, audioPath,coverPath, videoPath)
+        VALUES(?, ?, ?, ?, ?)
+        `);
+
      for (let i = 1; i <= 6; i++){
             insert.run(
                 'Unknown',
@@ -14,4 +19,7 @@ const insert = db.prepare(`INSERT INTO tracks (artist, title, audioPath, coverPa
             );
         }
         console.log("inserted 6 cloudinary placeholder tracks");
+        } else{
+            console.log("Tracks already exist, skipping seed");
+        }
 
