@@ -1,8 +1,9 @@
 // server.js
 require("dotenv").config();
-
 const express = require('express');
 const app = express();
+
+require("./seedTracks");
 const tracksRouter = require('./routes/tracks');
 const cors = require('cors');
 
