@@ -35,7 +35,49 @@ router.put(
       const audioFile = req.files?.audio?.[0];
       const videoFile = req.files?.video?.[0];
 
-      const fields = ['artist = ?', 'title = ?'];
+      let sql = 'UPDATE tracks SET artist =?, title =?';
+      let params = [artist, title];
+
+      if (coverFile){
+        sql += ', coverPath = ?';
+        params.push(coverFile.path);
+      }
+      if (audioFile){
+        sql += ', audioPath = ?';
+        params.push(audioFile.path);
+      }
+        
+        if (videoFile){
+        sql += ', videoPath = ?';
+        params.push(videoFile.path);
+        }
+
+        sql += 'WHERE id = ?';
+        params.push(id);
+
+        console.log('SQL to exercute:', sql);
+        console.log('parameters:', params);
+
+        const result =db.prepare(sql).run(...params);
+
+        if (result .changes === 0) {
+          return res.status(404).json({error: 'Trcak not found'});
+        }
+
+        const Updated = db.prepare('SELECT * FROM tracks WHERE id = ?').get(id);
+
+        return res.status(200).json(updated);
+
+      } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Update failed'});
+      }
+
+      
+      
+
+
+      /*const fields = ['artist = ?', 'title = ?'];
       const values = [artist, title];
 
       if (coverFile) {
@@ -69,8 +111,9 @@ router.put(
      return res.status(200).json(updatedTrack);
     } catch (err) {
       res.status(500).json({ error: 'Update failed' });
-    }
+    }*/
   }
 );
+
 
 module.exports = router;

@@ -12,14 +12,13 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-app.options("*", cors());
+app.options("/*all", cors());
 
 
 
 require("./seedTracks");
 
 const tracksRouter = require('./routes/tracks');
-const cors = require('cors');
 
 
 app.use(cors({ origin: '*' }));
