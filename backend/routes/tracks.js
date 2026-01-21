@@ -77,7 +77,7 @@ router.put(
       `).run(...values);
 
       const updated = db.prepare('SELECT * FROM tracks WHERE id = ?').get(id);
-      res.json(updated);
+      return res.json(updated);
     } catch (err) {
       res.status(500).json({ error: 'Update failed' });
     }
