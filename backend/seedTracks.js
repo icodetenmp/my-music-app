@@ -13,7 +13,7 @@ if(row.count === 0){
                 'Unknown',
                 'Empty Slot',
                 'https://res.cloudinary.com/dvp2cwhbz/video/upload/v1767686657/audio/default.mp3',
-                'https://res.cloudinary.com/dvp2cwhbz/image/upload/v1767686570/covers/placeholder${i}.jpg',
+                `https://res.cloudinary.com/dvp2cwhbz/image/upload/v1767686570/covers/placeholder${i}.jpg`,
                 'https://res.cloudinary.com/dvp2cwhbz/video/upload/v1767688475/video/1763412652253-UPLOAD_YOUR.mp4'
 
             );
@@ -22,4 +22,4 @@ if(row.count === 0){
         } else{
             console.log("Tracks already exist, skipping seed");
         }
-
+        
