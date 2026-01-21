@@ -40,17 +40,17 @@ router.put(
 
       if (coverFile) {
         fields.push('coverPath = ?');
-        values.push(cover);
+        values.push(coverFile.path);
       }
 
       if (audioFile) {
         fields.push('audioPath = ?');
-        values.push(audio);
+        values.push(audioFile.path);
       }
 
       if (videoFile) {
         fields.push('videoPath = ?');
-        values.push(video);
+        values.push(videoFile.path);
       }
 
       values.push(id);
@@ -61,12 +61,12 @@ router.put(
         WHERE id = ?
       `).run(...values);
 
-      if (result === 0){
+      if (result.changes === 0){
         return res.status(404).json({error: "Track not found"});
       }
 
       const updatedTrack = db.prepare('SELECT * FROM tracks WHERE id = ?').get(id);
-     return res.json(updatedTrack);
+     return res.status(200).json(updatedTrack);
     } catch (err) {
       res.status(500).json({ error: 'Update failed' });
     }
