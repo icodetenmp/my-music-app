@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const parser = require('../parser');
+const cloudinary = require('../cloudinary');
 
 // GET all tracks
 router.get('/', (req, res) => {
@@ -20,8 +21,8 @@ router.put(
     { name: 'cover', maxCount: 1 },
     { name: 'audio', maxCount: 1 },
     { name: 'video', maxCount: 1 }
-  ]),
-  (req, res) => {
+  ]), 
+  async(req, res) => {
     try {
       const { artist, title } = req.body;
       const id = req.params.id;
@@ -38,18 +39,33 @@ router.put(
       const values = [artist, title];
 
       if (coverFile) {
-        fields.push('coverPath = ?');
-        values.push(coverFile.path);
+        const coverResult = await clouidinary.uploader.upload(
+          coverFile.path,
+          {folder: 'covers'}
+        );
+        fields.push('coverpath = ?');
+        values.push(coverResult.secure_URL);
       }
 
+     
       if (audioFile) {
+        const audioResult = await clouidinary.uploader.upload(
+          audioFile.path,
+          {resource_type: 'video',
+            folder: 'audio'}
+        );
         fields.push('audioPath = ?');
-        values.push(audioFile.path);
+        values.push(audioResult.secure_URL);
       }
-
+      
       if (videoFile) {
+        const videoResult = await clouidinary.uploader.upload(
+          videoFile.path,
+          {resource_type: 'video',
+            folder: 'video'}
+        );
         fields.push('videoPath = ?');
-        values.push(videoFile.path);
+        values.push(videoResult.secure_URL);
       }
 
       values.push(id);
