@@ -39,45 +39,34 @@ router.put(
       const values = [artist, title];
 
       if (coverFile) {
-        const coverResult = await clouidinary.uploader.upload(
-          coverFile.path,
-          {folder: 'covers'}
-        );
-        fields.push('coverpath = ?');
-        values.push(coverResult.secure_URL);
+        fields.push('coverPath = ?');
+        values.push(cover);
       }
 
-     
       if (audioFile) {
-        const audioResult = await clouidinary.uploader.upload(
-          audioFile.path,
-          {resource_type: 'video',
-            folder: 'audio'}
-        );
         fields.push('audioPath = ?');
-        values.push(audioResult.secure_URL);
+        values.push(audio);
       }
-      
+
       if (videoFile) {
-        const videoResult = await clouidinary.uploader.upload(
-          videoFile.path,
-          {resource_type: 'video',
-            folder: 'video'}
-        );
         fields.push('videoPath = ?');
-        values.push(videoResult.secure_URL);
+        values.push(video);
       }
 
       values.push(id);
 
-      db.prepare(`
+      const result = db.prepare(`
         UPDATE tracks
         SET ${fields.join(', ')}
         WHERE id = ?
       `).run(...values);
 
-      const updated = db.prepare('SELECT * FROM tracks WHERE id = ?').get(id);
-      return res.json(updated);
+      if (result === 0){
+        return res.status(404).json({error: "Track not found"});
+      }
+
+      const updatedTrack = db.prepare('SELECT * FROM tracks WHERE id = ?').get(id);
+     return res.json(updatedTrack);
     } catch (err) {
       res.status(500).json({ error: 'Update failed' });
     }
