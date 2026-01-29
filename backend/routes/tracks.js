@@ -34,7 +34,67 @@ router.put(
       const coverFile = req.files?.cover?.[0];
       const audioFile = req.files?.audio?.[0];
       const videoFile = req.files?.video?.[0];
+      
+    
+      const fields = ['artist = ?', 'title = ?'];
+      const values = [artist, title];
+//CLOUD UPLOAD
+      if (coverFile) {
+        const coverUpload = await cloudinary.uploader.upload(
+          coverFile.path,
+          { Folder: "music_cover"}
+        );
+        fields.push('coverPath = ?');
+        values.push(coverUpload.secure_url);
+      }
 
+      if (audioFile) {
+        const audioUpload = await cloudinary.uploader.upload(
+          audioFile.path,
+          { Folder: "music_audio",
+            resource_type: "video"
+          }
+        );
+        fields.push('audioPath = ?');
+        values.push(audioUpload.secure_url);
+      }
+
+      if (videoFile) {
+        const videoUpload = await cloudinary.uploader.upload(
+          videoFile.path,
+          { Folder: "music_video",
+            resource_type: "video"
+          }
+        );
+        fields.push('videoPath = ?');
+        values.push(videoUpload.path);
+      }
+
+      values.push(id);
+
+      const sql = `
+        UPDATE tracks
+        SET ${fields.join(', ')}
+        WHERE id = ?
+      `;
+
+      db.prepare(sql).run(values);
+
+      //send updated track back
+      const updatedTrack = db.prepare('SELECT * FROM tracks WHERE id = ?').get(id);
+      res.json(updatedTrack);
+    } catch (err) {
+      console.error("Updaated error:", err);
+      res.status(500).json({ error: 'Update failed' });
+    }
+  }
+);
+
+
+module.exports = router;
+
+
+/*
       let sql = 'UPDATE tracks SET artist =?, title =?';
       let params = [artist, title];
 
@@ -73,47 +133,4 @@ router.put(
         return res.status(500).json({ error: 'Update failed'});
       }
 
-      
-      
-
-
-      /*const fields = ['artist = ?', 'title = ?'];
-      const values = [artist, title];
-
-      if (coverFile) {
-        fields.push('coverPath = ?');
-        values.push(coverFile.path);
-      }
-
-      if (audioFile) {
-        fields.push('audioPath = ?');
-        values.push(audioFile.path);
-      }
-
-      if (videoFile) {
-        fields.push('videoPath = ?');
-        values.push(videoFile.path);
-      }
-
-      values.push(id);
-
-      const result = db.prepare(`
-        UPDATE tracks
-        SET ${fields.join(', ')}
-        WHERE id = ?
-      `).run(...values);
-
-      if (result.changes === 0){
-        return res.status(404).json({error: "Track not found"});
-      }
-
-      const updatedTrack = db.prepare('SELECT * FROM tracks WHERE id = ?').get(id);
-     return res.status(200).json(updatedTrack);
-    } catch (err) {
-      res.status(500).json({ error: 'Update failed' });
-    }*/
-  }
-);
-
-
-module.exports = router;
+      */
