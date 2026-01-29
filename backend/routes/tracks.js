@@ -17,57 +17,44 @@ router.get('/', (req, res) => {
 // UPDATE existing track
 router.put(
   '/:id',
-  parser.fields([
-    { name: 'cover', maxCount: 1 },
-    { name: 'audio', maxCount: 1 },
-    { name: 'video', maxCount: 1 }
-  ]), 
-  async(req, res) => {
+  parser.any(), async(req, res) => {
     try {
       const { artist, title } = req.body;
       const id = req.params.id;
 
-      if (!artist || !title) {
-        return res.status(400).json({ error: 'Missing artist or title' });
-      }
-
-      const coverFile = req.files?.cover?.[0];
-      const audioFile = req.files?.audio?.[0];
-      const videoFile = req.files?.video?.[0];
+      const coverFile = req.files.find(f => f.fieldname === "cover");
+      const audioFile = req.files.find(f => f.fieldname === "audio");
+      const videoFile = req.files.find(f => f.fieldname === "video");
       
     
-      const fields = ['artist = ?', 'title = ?'];
-      const values = [artist, title];
+      const fields = [];
+      const values = [];
 //CLOUD UPLOAD
-      if (coverFile) {
-        const coverUpload = await cloudinary.uploader.upload(
-          coverFile.path,
-          { Folder: "music_cover"}
-        );
-        fields.push('coverPath = ?');
-        values.push(coverUpload.secure_url);
+      if (artist){
+        fields.push("artist = ?");
+        values.push(artist);
       }
+      if(title){
+        fields.push("title = ?");
+        values.push(title);
+      }
+      if (coverFile) {
+        fields.push("coverPath = ?");
+        values.push(coverFile.path);
+      };
 
       if (audioFile) {
-        const audioUpload = await cloudinary.uploader.upload(
-          audioFile.path,
-          { Folder: "music_audio",
-            resource_type: "video"
-          }
-        );
         fields.push('audioPath = ?');
-        values.push(audioUpload.secure_url);
+        values.push(audioFile.path);
       }
 
       if (videoFile) {
-        const videoUpload = await cloudinary.uploader.upload(
-          videoFile.path,
-          { Folder: "music_video",
-            resource_type: "video"
-          }
-        );
         fields.push('videoPath = ?');
-        values.push(videoUpload.secure_url);
+        values.push(videoFile.path);
+      }
+
+      if (!fields.length){
+        return res.status(400).json({error: "NOthing to update"});
       }
 
       values.push(id);
