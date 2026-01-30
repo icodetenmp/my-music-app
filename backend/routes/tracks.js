@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const parser = require('../parser');
+const parser = require('../parser.js');
 const cloudinary = require('../cloudinary');
 
 // GET all tracks
