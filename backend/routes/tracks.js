@@ -5,6 +5,16 @@ const parser = require('../parser.js');
 const cloudinary = require('../cloudinary');
 
 // GET all tracks
+router.get('/', async (req, res) => {
+  try{
+    const tracks = await db.prepare('SELECT * FROM tracks').all();
+    res.json(tracks);
+  } catch (err){
+    console.error('Get tracks error:', err);
+    res.status(500).json({error: 'Failed to get tracks'});
+
+  }
+})
 
 router.put('/:id', parser.any(), async (req, res) => {
   try {
