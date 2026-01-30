@@ -18,6 +18,11 @@ router.get('/', async (req, res) => {
 
 router.put('/:id', parser.any(), async (req, res) => {
   try {
+    console.log('Upload request recieved');
+    console.log('Track ID:', req.params.id);
+    console.log('Body:', req.body);
+    console.log('Files:', req.files);
+    
     const { artist, title } = req.body;
     const id = req.params.id;
 
