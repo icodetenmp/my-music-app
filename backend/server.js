@@ -21,8 +21,6 @@ require("./seedTracks");
 const tracksRouter = require('./routes/tracks');
 
 
-app.use(cors({ origin: '*' }));
-
 // Parse JSON bodies
 app.use(express.json());
 
