@@ -76,8 +76,10 @@ router.put('/:id', parser.any(), async (req, res) => {
 
     res.json(updatedTrack);
   } catch (err) {
-    console.error("Updated error:", err);
-    res.status(500).json({ error: 'Update Failed' });
+    console.error('UPLOAD ERROR');
+    console.error('Error message:', err.message);
+    console.error('Error statck:', err.stack);
+    res.status(500).json({ error: 'Update Failed', details: err.message });
   }
 });
 
