@@ -7,7 +7,9 @@ const cloudinary = require('../cloudinary');
 
 router.use((req, res, next)=> {
   console.log('Route middleware hit:', req.method,req.url);
+  console.log('About to call next()');
   next();
+  console.log('After next() returned');
 })
 // GET all tracks
 router.get('/', async (req, res) => {
