@@ -8,7 +8,15 @@ const app = express();
 
 app.use(cors());
 
-
+//debug
+app.use((req, res, next) => {
+    console.log('INCOMING REQUEST ');
+    console.log('Method:', req.method);
+    console.log('URL:', req.url);
+    console.log('Origin:', req.headers.origin);
+    console.log('==============================');
+    next();
+});
 
 require("./seedTracks");
 
