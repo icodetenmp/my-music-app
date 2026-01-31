@@ -4,6 +4,11 @@ const db = require('../db');
 const parser = require('../parser.js');
 const cloudinary = require('../cloudinary');
 
+
+router.use((req, res, next)=> {
+  console.log('Route middleware hit:', req.method,req.url);
+  next();
+})
 // GET all tracks
 router.get('/', async (req, res) => {
   try{
