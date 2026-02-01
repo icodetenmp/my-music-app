@@ -1,6 +1,20 @@
 // parser.js
 const multer = require('multer');
-const CloudinaryStorage = require('multer-storage-cloudinary'); // No curly braces
+
+const storage = multer.memoryStorage();
+
+module.exports = multer({
+  storage: storage,
+  limits: {
+    fileSize: 50 * 1024 * 1024 // %0 limit
+  }
+});
+
+
+
+
+
+/*const CloudinaryStorage = require('multer-storage-cloudinary'); // No curly braces
 const cloudinary = require('./cloudinary'); // configured Cloudinary instance
 
 const storage = new CloudinaryStorage({
@@ -24,6 +38,6 @@ const storage = new CloudinaryStorage({
       public_id: Date.now() + '-' + file.originalname.replace(/\s+/g, '_')
     };
   }
-});
+});*/
 
 module.exports = multer({ storage });

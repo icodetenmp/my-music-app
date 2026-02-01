@@ -24,6 +24,7 @@ router.get('/', async (req, res) => {
 })
 
 router.put('/:id', parser.any(), async (req, res) => {
+  console.log('INSIDE ROUTE HANDLER');
   try {
     console.log('Upload request recieved');
     console.log('Track ID:', req.params.id);
@@ -89,6 +90,10 @@ router.put('/:id', parser.any(), async (req, res) => {
     res.status(500).json({ error: 'Update Failed', details: err.message });
   }
 });
-
+router.use((err, req, res, next) => {
+  console.error('=====ROUTER ERROR=====');
+  console.error(err);
+  res.status(500).json({error: err.message});
+});
 
 module.exports = router;
