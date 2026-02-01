@@ -53,19 +53,70 @@ router.put('/:id', parser.any(), async (req, res) => {
       values.push(title);
     }
 
-    if (coverFile?.path) {
-      fields.push("coverPath = ?");
-      values.push(coverFile.path);
+    if (coverFile) {
+      try{
+        console.log('Uploading cover to Cloudinary...');
+        const result = await new Promise((resolve, reject) => {
+          const upLoadStream = cloudinary.uploader.upload_stream(
+           { folder: 'covers', resource_type: 'image'},
+           (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+           }
+          );
+          upLoadStream.end(coverFile.buffer);
+        });
+        fields.push("coverPath = ?");
+      values.push(result.secure_url);
+      console.log('Cover uploaded:', result.secure_url);
+      }catch (err) {
+        console.error('Cover upload failed:', err);
+      }
+      
     }
 
-    if (audioFile?.path) {
-      fields.push("audioPath = ?");
-      values.push(audioFile.path);
+     if (audioFile) {
+      try{
+        console.log('Uploading audio to Cloudinary...');
+        const result = await new Promise((resolve, reject) => {
+          const upLoadStream = cloudinary.uploader.upload_stream(
+           { folder: 'audio', resource_type: 'video'},
+           (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+           }
+          );
+          upLoadStream.end(audioFile.buffer);
+        });
+        fields.push("audioPath = ?");
+      values.push(result.secure_url);
+      console.log('Audio uploaded:', result.secure_url);
+      }catch (err) {
+        console.error('Audio upload failed:', err);
+      }
+      
     }
 
-    if (videoFile?.path) {
-      fields.push("videoPath = ?");
-      values.push(videoFile.path);
+     if (videoFile) {
+      try{
+        console.log('Uploading Video to Cloudinary...');
+        const result = await new Promise((resolve, reject) => {
+          const upLoadStream = cloudinary.uploader.upload_stream(
+           { folder: 'video', resource_type: 'video'},
+           (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+           }
+          );
+          upLoadStream.end(videoFile.buffer);
+        });
+        fields.push("videoPath = ?");
+      values.push(result.secure_url);
+      console.log('Video uploaded:', result.secure_url);
+      }catch (err) {
+        console.error('Video upload failed:', err);
+      }
+      
     }
 
     if (!fields.length) {
