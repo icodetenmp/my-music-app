@@ -122,18 +122,26 @@ router.put('/:id', parser.any(), async (req, res) => {
     if (!fields.length) {
       return res.status(400).json({ error: "Nothing to update" });
     }
+    console.log('====ABOUT TO UPDATE DATABASE====');
+    console.log('Field to update:', fields);
+    console.log('Values:', values);
+    console.log('TRACK ID:', id);
 
     values.push(id);
 
+    console.log('Executing SQL...');
     db.prepare(
       `UPDATE tracks SET ${fields.join(', ')} WHERE id = ?`
     ).run(values);
+
+    console.log('SQL executed succesfully');
 
     const updatedTrack = db
       .prepare('SELECT * FROM tracks WHERE id = ?')
       .get(id);
 
     res.json(updatedTrack);
+    console.log('response sent!');
   } catch (err) {
     console.error('UPLOAD ERROR');
     console.error('Error message:', err.message);
